@@ -1,5 +1,5 @@
 import { passport } from '@imtbl/sdk'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { UserProfile } from '@imtbl/sdk/passport';
 import { PassportButton } from './components/PassportButton';
 import { parseJwt, passportProvider } from './utils/passport';
@@ -10,6 +10,27 @@ import { passportDashboardUrl } from './utils/config';
 function App({passportInstance}: {passportInstance: passport.Passport}) {
   const [userInfo, setUserInfo] = useState<UserProfile>();
   const [walletAddress, setWalletAddress] = useState<string>();
+
+  useEffect(() => {
+    const login = async () => {
+      const token = await passportInstance.getIdToken();
+      const ppUserInfo = await passportInstance.getUserInfo();
+      if(!token || !ppUserInfo) {
+        console.log('user not logged in');
+        console.log(token);
+        console.log(ppUserInfo);
+      } else {
+        console.log('user is logged in... calling eth_requestAccounts');
+        const [userAddress] = await passportProvider.request({ method: 'eth_requestAccounts' });
+        console.log(userAddress);
+        setUserInfo(ppUserInfo);
+        setWalletAddress(userAddress);
+      }
+    }
+
+    login();
+    
+  }, [passportInstance])
 
   async function login(){
     try{
