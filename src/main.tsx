@@ -5,8 +5,9 @@ import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import PassportRedirect from './components/PassportRedirect.tsx'
 import { passportInstance } from './utils/passport.ts'
-import { createWeb3Modal } from '@web3modal/ethers5/react'
+import { createWeb3Modal } from '@web3modal/ethers/react'
 import { ethersConfig, mainnet, projectId } from './utils/config.ts'
+import { PassportContextProvider } from './context/PassportContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,8 @@ createWeb3Modal({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <PassportContextProvider>
+      <RouterProvider router={router} />
+    </PassportContextProvider>
   </React.StrictMode>,
 )

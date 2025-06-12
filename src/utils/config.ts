@@ -1,5 +1,5 @@
 import { Environment } from "@imtbl/sdk/x";
-import { defaultConfig } from "@web3modal/ethers5/react"
+import { defaultConfig } from "@web3modal/ethers/react"
 
 /**
  * Application Configuration

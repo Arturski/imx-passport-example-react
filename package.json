@@ -10,10 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@imtbl/sdk": "^1.77.5",
-    "@web3modal/ethers5": "^5.0.11",
+    "@imtbl/sdk": "^2.2.4",
+    "@web3modal/ethers": "^5.1.11",
     "buffer": "^6.0.3",
-    "ethers": "^5.7.2",
+    "ethers": "^6.14.3",
     "jsbi": "^3.2.5",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",

@@ -1,10 +1,11 @@
 import { 
-  useWalletInfo, useDisconnect, useWeb3Modal, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers5/react';
+  useWalletInfo, useDisconnect, useWeb3Modal, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react';
 import './ExternalWallets.css';
-import { passportInstance, passportProvider } from '../utils/passport';
-import { useCallback, useEffect, useState } from 'react';
+import { passportInstance } from '../utils/passport';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { generateNonce } from 'siwe';
 import { mainnet } from '../utils/config';
+import { PassportContext } from '../context/PassportContext';
 
 export const ExternalWallets = () => {
   const {open} = useWeb3Modal()
@@ -12,6 +13,7 @@ export const ExternalWallets = () => {
   const { walletProvider } = useWeb3ModalProvider();
   const {address, chainId} = useWeb3ModalAccount();
   const {walletInfo} = useWalletInfo();
+  const {passportProvider} = useContext(PassportContext);
 
   // Linked Wallets
   const [linkedWallets, setLinkedWallets] = useState<string[] | undefined>(undefined);
@@ -27,6 +29,7 @@ export const ExternalWallets = () => {
 
   const linkWallet = useCallback(async () => {
     if(!walletProvider || !walletProvider.request) return;
+    if(!passportProvider) return;
     setIntentToLinkWallet(true);
     if(chainId !== mainnet.chainId) {
       alert("You'll need to switch to the Ethereum network in your wallet before linking it to Passport.")
@@ -53,7 +56,7 @@ export const ExternalWallets = () => {
         chainId: mainnet.chainId,
       },
       message: {
-        walletAddress: address.toLowerCase(),
+        walletAddress: address?.toLowerCase(),
         immutablePassportAddress: accounts[0].toLowerCase(),
         condition: "I agree to link this wallet to my Immutable Passport account.",
         nonce
@@ -92,7 +95,7 @@ export const ExternalWallets = () => {
       signature = await walletProvider.request({
         method: 'eth_signTypedData_v4',
         params: [
-          address.toLowerCase(),
+          address?.toLowerCase(),
           typedData
         ]
       });
@@ -108,7 +111,7 @@ export const ExternalWallets = () => {
     try {
       const result = await passportInstance.linkExternalWallet({
         type: walletInfo?.rdns as string || '', // This must be a valid rdns, hardcoding to MetaMask for now
-        walletAddress: address.toLowerCase(),
+        walletAddress: address?.toLowerCase() || '',
         signature: signature,
         nonce: nonce
       });

@@ -1,18 +1,21 @@
 import { passport } from '@imtbl/sdk'
-import { useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { UserProfile } from '@imtbl/sdk/passport';
 import { PassportButton } from './components/PassportButton';
-import { parseJwt, passportProvider } from './utils/passport';
+import { parseJwt } from './utils/passport';
 import './App.css'
 import { ExternalWallets } from './components/ExternalWallets';
 import { passportDashboardUrl } from './utils/config';
+import { PassportContext } from './context/PassportContext';
 
 function App({passportInstance}: {passportInstance: passport.Passport}) {
   const [userInfo, setUserInfo] = useState<UserProfile>();
   const [walletAddress, setWalletAddress] = useState<string>();
+  const {passportProvider} = useContext(PassportContext);
 
   useEffect(() => {
     const login = async () => {
+      if(!passportProvider) return;
       const token = await passportInstance.getIdToken();
       const ppUserInfo = await passportInstance.getUserInfo();
       if(!token || !ppUserInfo) {
@@ -32,7 +35,7 @@ function App({passportInstance}: {passportInstance: passport.Passport}) {
     
   }, [passportInstance])
 
-  async function login(){
+  const login = useCallback(async() =>{
     try{
       await passportProvider?.request({ method: 'eth_requestAccounts' });
     } catch(err) {
@@ -56,16 +59,16 @@ function App({passportInstance}: {passportInstance: passport.Passport}) {
       console.log("Failed to fetch idToken");
       console.error(err);
     }
-  }
+  },[passportProvider])
 
   async function idTokenClick() {
     const idToken = await passportInstance.getIdToken();
-    window.open(`https://jwt.io?token=${idToken}`, "_blank")
+    window.open(`https://jwt.io#token=${idToken}`, "_blank")
   }
 
   async function accessTokenClick() {
     const accessToken = await passportInstance.getAccessToken();
-    window.open(`https://jwt.io?token=${accessToken}`, "_blank")
+    window.open(`https://jwt.io#token=${accessToken}`, "_blank")
   }
 
   function logout(){
